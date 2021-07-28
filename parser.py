@@ -98,22 +98,4 @@ print(result)
 url = 'https://gremir.ru/zadvizhki/stalnye-flancevye/30s41nzh/mzta/zkl2-125/'
 response = requests.get(url)
 dom = BeautifulSoup(response.text, 'html.parser')
-
-result = dict();
-name = dom.find('h1')
-if name != None : 
-	result['name'] = name.text.strip()
-	
-price = dom.find('span', {'class': 'price'})
-if price != None : 
-	result['price'] = price.attrs.get('data-price')
-	
-div_img = dom.find('div', {'id': 'product-gallery'})
-if div_img != None : 
-	result['images'] = [];
-	for value in div_img.findAll('a'):
-		result['images'].append(value.attrs.get('href'))
-
-strRes = json.dumps(result)
-print(strRes)
 '''
