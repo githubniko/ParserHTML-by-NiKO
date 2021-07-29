@@ -27,11 +27,11 @@ class ParserHTML(object):
 		result = dict()
 		for value in template.find():
 			if(value.name != None) :
-				print(value)
+				#print(value)
 				# Парсим шаблон <tag>$var</tag>
 				regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>', str(value)) # ищим переменную
 				if regxRes :
-					print(regxRes)
+					#print(regxRes)
 					attrTemplate = self.AttrVarToTrue(value.attrs) # заменяем в значении $var на True
 					# Производим поиск шаблона в HTML документе
 					tag = dom.find_all(value.name, attrTemplate)
@@ -48,7 +48,7 @@ class ParserHTML(object):
 				clearValue = re.sub(r'>.*<', r'><', str(value)) # убераем внутннее содержимое
 				regxRes = re.findall(r'<.*(\$([\w\d]+)).*><\/.*>', clearValue) # ищим переменную
 				if regxRes :
-					print(regxRes)
+					#print(regxRes)
 					# находим название нужной переменной
 					for attr in value.attrs : 
 						if(value.attrs.get(attr) == regxRes[0][0]) : # если найднеа
