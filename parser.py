@@ -18,7 +18,7 @@ html = '<html>\
 		<a href="img3.jpg"></a>\
 	</div>\
 </html>'
-
+ 
 # шаблон для парсинга
 template = '\
 <template>\
@@ -51,6 +51,7 @@ def parsing(template, html) :
 			# Парсим шаблон <tag>$var</tag>
 			regxRes = re.findall(r'<(.*)>.*\$([\w\d]+).*<\/.*>', str(value)) # ищим переменную
 			if regxRes :
+				print(regxRes)
 				attrTemplate = AttrVarToTrue(value.attrs) # заменяем в значении $var на True
 				# Производим поиск шаблона в HTML документе
 				tag = dom.find_all(value.name, attrTemplate)
@@ -64,11 +65,10 @@ def parsing(template, html) :
 						result[regxRes[0][1]] = tag[0].text.strip()
 				
 			# Парсим шаблон <tag attr="$var">text</tag>
-			regxRes = re.findall(r'<.*(\$([\w\d]+)).*>.*<\/.*>', str(value)) # ищим переменную
-			test = template.find(value.name, attr=re.compile(r'class'))
-			print(test)
+			clearValue = re.sub(r'>.*<', r'><', str(value)) # убераем внутннее содержимое
+			regxRes = re.findall(r'<.*(\$([\w\d]+)).*><\/.*>', clearValue) # ищим переменную
 			if regxRes :
-				#print(regxRes)
+				print(regxRes)
 				# находим название нужной переменной
 				for attr in value.attrs : 
 					if(value.attrs.get(attr) == regxRes[0][0]) : # если найднеа
@@ -90,6 +90,7 @@ def parsing(template, html) :
 				if(value.find()) : 
 					res = parsing(str(value), html) # рекурсия
 					result = {**result, **res} # объединяем два списка
+					
 	return result
 
 result = parsing(template, html)
