@@ -27,11 +27,11 @@ class ParserHTML(object):
 		result = dict()
 		for value in template.find():
 			if(value.name != None) :
-				#print(value)
+				print(value)
 				# Парсим шаблон <tag>$var</tag>
-				regxRes = re.findall(r'<(.*)>.*\$([\w\d]+).*<\/.*>', str(value)) # ищим переменную
+				regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>', str(value)) # ищим переменную
 				if regxRes :
-					#print(regxRes)
+					print(regxRes)
 					attrTemplate = self.AttrVarToTrue(value.attrs) # заменяем в значении $var на True
 					# Производим поиск шаблона в HTML документе
 					tag = dom.find_all(value.name, attrTemplate)
@@ -39,16 +39,16 @@ class ParserHTML(object):
 						if(len(tag) > 1) : # если несколько объектов, то нужно их разместить в массив
 							arr = []
 							for parent in tag :
-								arr.append(parent.text)
+								arr.append(parent.contents)
 							result[regxRes[0][1]] = arr									
 						else : # иначе просто записываем в переменную
-							result[regxRes[0][1]] = tag[0].text.strip()
+							result[regxRes[0][1]] = tag[0].contents
 					
 				# Парсим шаблон <tag attr="$var">text</tag>
 				clearValue = re.sub(r'>.*<', r'><', str(value)) # убераем внутннее содержимое
 				regxRes = re.findall(r'<.*(\$([\w\d]+)).*><\/.*>', clearValue) # ищим переменную
 				if regxRes :
-					#print(regxRes)
+					print(regxRes)
 					# находим название нужной переменной
 					for attr in value.attrs : 
 						if(value.attrs.get(attr) == regxRes[0][0]) : # если найднеа
@@ -66,31 +66,29 @@ class ParserHTML(object):
 							else :
 								result[regxRes[0][1]] = None # если значение или тэг не найдены, то выводим None
 					
-					# смотрим есть ли дочерние объекты
-					if(value.find()) : 
-						res = self.parsing(str(value), html) # рекурсия
-						result = {**result, **res} # объединяем два списка
+				# смотрим есть ли дочерние объекты
+				child = value.find()
+				if(child) : 
+					res = self.parsing(str(value), html) # рекурсия
+					result = {**result, **res} # объединяем два списка
 						
 		return result
-'''
+
 ### Example
 #########################################
-# шаблон для парсинга
-template = '\
-<template>\
-	<h1 class="name" data-name="$head">$name</h1>\
-	<h2>$name2</h2>\
-	<span elem="$id">$price</span>\
-	<span data-type-3="$data"></span>\
-	<div id="product-gallery" value="$value">\
-		<a href="$img"></a>\
-	</div>\
-</template>' 
 
-result = ParserHTML(template, contents)
-print(result.get())
+if __name__ == '__main__':
+	# шаблон для парсинга
+	template = '\
+	<template>\
+		<h1>$head</h1>\
+		<p>$text</p>\
+		<p><a href="$link"></a></p>\
+	</template>' 
 
-url = 'https://gremir.ru/zadvizhki/stalnye-flancevye/30s41nzh/mzta/zkl2-125/'
-response = requests.get(url)
-dom = BeautifulSoup(response.text, 'html.parser')
-'''
+	url = 'https://example.com/'
+	HTML = requests.get(url).text
+
+	result = ParserHTML(template, HTML)
+	print(result.get())
+
