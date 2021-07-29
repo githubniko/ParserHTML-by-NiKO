@@ -10,12 +10,12 @@ currDirname = os.path.dirname(os.path.realpath(__file__))
 # шаблон для парсинга
 template = '\
 <template>\
-	<h1 class="name" data-name="$head">$name</h1>\
-	<h2>$name2</h2>\
-	<span elem="$id">$price</span>\
-	<span data-type-3="$data"></span>\
-	<div id="product-gallery" value="$value">\
-		<a href="$img"></a>\
+	<h1 class="name" data-name="$data-name">$Head1</h1>\
+	<h2>$Head2</h2>\
+	<span elem="$Сurrency">$Price</span>\
+	<span data-type="$Type">$Description</span>\
+	<div id="product-gallery" value="$product_gallery">\
+		<a href="$Img"></a>\
 	</div>\
 </template>' 
 
