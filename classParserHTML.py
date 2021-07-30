@@ -25,7 +25,7 @@ class ParserHTML(object):
 		dom = BeautifulSoup(html,'html.parser') # то, что нужно спарсить
 		template =  BeautifulSoup(template, 'html.parser')
 		result = dict()
-		for value in template.find():
+		for value in template.find(): 
 			if(value.name != None) :
 				#print(value)
 				# Парсим шаблон <tag>$var</tag>
