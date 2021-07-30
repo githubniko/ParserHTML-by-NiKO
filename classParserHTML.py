@@ -29,21 +29,31 @@ class ParserHTML(object):
 			if(value.name != None) :
 				#print(value)
 				# Парсим шаблон <tag>$var</tag>
-				regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>', str(value)) # ищим переменную
-				if regxRes :
-					#print(regxRes)
+
+				# Смотрим есть ли дочерние объекты
+				child = value.find()
+				if(child) : 
+					# находим объект в дереве и передаем его в рексию
 					attrTemplate = self.AttrVarToTrue(value.attrs) # заменяем в значении $var на True
-					# Производим поиск шаблона в HTML документе
 					tag = dom.find_all(value.name, attrTemplate)
-					if tag :
-						if(len(tag) > 1) : # если несколько объектов, то нужно их разместить в массив
-							arr = []
-							for parent in tag :
-								arr.append(parent.contents)
-							result[regxRes[0][1]] = arr									
-						else : # иначе просто записываем в переменную
-							result[regxRes[0][1]] = tag[0].contents
-					
+					res = self.parsing(str(value), str(tag)) # рекурсия
+					result = {**result, **res} # объединяем два списка
+				else :
+					regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>$', str(value)) # ищим переменную
+					if regxRes :
+						#print(regxRes)
+						attrTemplate = self.AttrVarToTrue(value.attrs) # заменяем в значении $var на True
+						# Производим поиск шаблона в HTML документе
+						tag = dom.find_all(value.name, attrTemplate)
+						if tag :
+							if(len(tag) > 1) : # если несколько объектов, то нужно их разместить в массив
+								arr = []
+								for parent in tag :
+									arr.append(re.sub(r'^\s+|\n|\r|\s+$', '', parent.string))
+								result[regxRes[0][1]] = arr
+							else : # иначе просто записываем в переменную
+								result[regxRes[0][1]] = re.sub(r'^\s+|\n|\r|\s+$', '', tag[0].string)
+						
 				# Парсим шаблон <tag attr="$var">text</tag>
 				clearValue = re.sub(r'>.*<', r'><', str(value)) # убераем внутннее содержимое
 				regxRes = re.findall(r'<.*(\$([\w\d]+)).*><\/.*>', clearValue) # ищим переменную
@@ -65,13 +75,6 @@ class ParserHTML(object):
 									result[regxRes[0][1]] = tag[0].attrs.get(attr)
 							else :
 								result[regxRes[0][1]] = None # если значение или тэг не найдены, то выводим None
-					
-				# смотрим есть ли дочерние объекты
-				child = value.find()
-				if(child) : 
-					res = self.parsing(str(value), html) # рекурсия
-					result = {**result, **res} # объединяем два списка
-						
 		return result
 
 ### Example
