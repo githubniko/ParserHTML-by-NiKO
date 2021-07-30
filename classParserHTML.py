@@ -49,10 +49,10 @@ class ParserHTML(object):
 							if(len(tag) > 1) : # если несколько объектов, то нужно их разместить в массив
 								arr = []
 								for parent in tag :
-									arr.append(re.sub(r'^\s+|\n|\r|\s+$', '', str(parent.contents)))
+									arr.append(re.sub(r'^\s+|\n|\r|\s+$', '', r''.join(map(str,parent.contents))))
 								result[regxRes[0][1]] = arr
 							else : # иначе просто записываем в переменную
-								result[regxRes[0][1]] = re.sub(r'^\s+|\n|\r|\s+$', '', str(tag[0].contents))
+								result[regxRes[0][1]] = re.sub(r'^\s+|\n|\r|\s+$', '', r''.join(map(str,tag[0].contents)))
 						
 				# Парсим шаблон <tag attr="$var">text</tag>
 				clearValue = re.sub(r'>.*<', r'><', str(value)) # убераем внутннее содержимое
