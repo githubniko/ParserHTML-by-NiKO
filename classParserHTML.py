@@ -49,8 +49,8 @@ class ParserHTML(object):
 							if(len(tag) > 1) : # если несколько объектов, то нужно их разместить в массив
 								arr = []
 								for parent in tag :
-									arr.append(parent.string)
-								result[regxRes[0][1]] = re.sub(r'^\s+|\n|\r|\s+$', '', arr)								
+									arr.append(re.sub(r'^\s+|\n|\r|\s+$', '', parent.string))
+								result[regxRes[0][1]] = arr
 							else : # иначе просто записываем в переменную
 								result[regxRes[0][1]] = re.sub(r'^\s+|\n|\r|\s+$', '', tag[0].string)
 						
@@ -75,13 +75,6 @@ class ParserHTML(object):
 									result[regxRes[0][1]] = tag[0].attrs.get(attr)
 							else :
 								result[regxRes[0][1]] = None # если значение или тэг не найдены, то выводим None
-					
-				# смотрим есть ли дочерние объекты
-				'''child = value.find()
-				if(child) : 
-					res = self.parsing(str(value), html) # рекурсия
-					result = {**result, **res} # объединяем два списка
-				'''		
 		return result
 
 ### Example
