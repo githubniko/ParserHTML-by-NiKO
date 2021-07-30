@@ -35,8 +35,8 @@ class ParserHTML(object):
 				if(child) : 
 					# находим объект в дереве и передаем его в рексию
 					attrTemplate = self.AttrVarToTrue(value.attrs) # заменяем в значении $var на True
-					tag = dom.find_all(value.name, attrTemplate)
-					res = self.parsing(str(value), str(tag)) # рекурсия
+					tag = dom.find(value.name, attrTemplate)
+					res = self.parsing(str(value), r''.join(map(str,tag.contents))) # рекурсия
 					result = {**result, **res} # объединяем два списка
 				else :
 					regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>$', str(value)) # ищим переменную
