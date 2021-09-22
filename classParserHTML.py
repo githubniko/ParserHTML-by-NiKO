@@ -27,7 +27,7 @@ class ParserHTML(object):
 		result = dict()
 		for value in template.find(): 
 			if(value.name != None) :
-				#print(value)
+				# print(value)
 				# Парсим шаблон <tag>$var</tag>
 
 				# Смотрим есть ли дочерние объекты
@@ -35,9 +35,21 @@ class ParserHTML(object):
 				if(child) : 
 					# находим объект в дереве и передаем его в рексию
 					attrTemplate = self.AttrVarToTrue(value.attrs) # заменяем в значении $var на True
-					tag = dom.find(value.name, attrTemplate)
-					res = self.parsing(str(value), r''.join(map(str,tag.contents))) # рекурсия
-					result = {**result, **res} # объединяем два списка
+					tag = dom.find_all(value.name, attrTemplate)
+					if tag :
+						if(len(tag) > 1) : # если несколько объектов, то нужно их разместить в массив
+							arr = []
+							for elemTag in tag:
+								res = self.parsing(str(value), r''.join(map(str,elemTag.contents))) # рекурсия
+								_result = {**result, **res} # объединяем два списка
+								arr.append(_result)
+							return arr
+						else : # иначе просто записываем в переменную
+							res = self.parsing(str(value), r''.join(map(str,tag.contents))) # рекурсия
+							_result = {**result, **res} # объединяем два списка
+							return _result
+
+					# return result
 				else :
 					regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>$', str(value)) # ищим переменную
 					if regxRes :
@@ -57,6 +69,7 @@ class ParserHTML(object):
 				# Парсим шаблон <tag attr="$var">text</tag>
 				clearValue = re.sub(r'>.*<', r'><', str(value)) # убераем внутннее содержимое
 				regxRes = re.findall(r'<.*(\$([\w\d]+)).*><\/.*>', clearValue) # ищим переменную
+				# print(regxRes)
 				if regxRes :
 					#print(regxRes)
 					# находим название нужной переменной
@@ -75,6 +88,8 @@ class ParserHTML(object):
 									result[regxRes[0][1]] = tag[0].attrs.get(attr)
 							else :
 								result[regxRes[0][1]] = None # если значение или тэг не найдены, то выводим None
+				
+
 		return result
 
 ### Example
@@ -88,6 +103,7 @@ if __name__ == '__main__':
 		<p>$text</p>\
 		<p><a href="$link"></a></p>\
 	</template>' 
+	
 
 	url = 'https://example.com/'
 	HTML = requests.get(url).text
