@@ -47,9 +47,6 @@ class ParserHTML(object):
 						else : # иначе просто записываем в переменную
 							res = self.parsing(str(value), r''.join(map(str,tag[0].contents))) # рекурсия
 							result = {**result, **res} # объединяем два списка
-							# return _result
-
-					# return _result
 				else :
 					regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>$', str(value)) # ищим переменную
 					if regxRes :
