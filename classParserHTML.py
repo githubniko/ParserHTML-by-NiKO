@@ -43,13 +43,13 @@ class ParserHTML(object):
 								res = self.parsing(str(value), r''.join(map(str,elemTag.contents))) # рекурсия
 								_result = {**result, **res} # объединяем два списка
 								arr.append(_result)
-							return arr
+							result = arr
 						else : # иначе просто записываем в переменную
-							res = self.parsing(str(value), r''.join(map(str,tag.contents))) # рекурсия
-							_result = {**result, **res} # объединяем два списка
-							return _result
+							res = self.parsing(str(value), r''.join(map(str,tag[0].contents))) # рекурсия
+							result = {**result, **res} # объединяем два списка
+							# return _result
 
-					# return result
+					# return _result
 				else :
 					regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>$', str(value)) # ищим переменную
 					if regxRes :
