@@ -67,8 +67,8 @@ class ParserHTML(object):
 								result[regxRes[0][1]] = re.sub(r'^\s+|\n|\r|\s+$', '', r''.join(map(str,tag[0].contents)))
 						
 				# Парсим шаблон <tag attr="$var">text</tag>
-				clearValue = re.sub(r'>.*<', r'><', str(value)) # убераем внутннее содержимое
-				regxRes = re.findall(r'<.*(\$([\w\d]+)).*><\/.*>', clearValue) # ищим переменную
+				clearValue = re.sub(r'>.*<.*>', r'/>', str(value)) # убераем внутннее содержимое
+				regxRes = re.findall(r'<.*(\$([\w\d]+)).*/>', clearValue) # ищим переменную
 				# print(regxRes)
 				if regxRes :
 					#print(regxRes)
