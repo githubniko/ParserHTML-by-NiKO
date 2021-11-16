@@ -34,19 +34,36 @@ class ParserHTML(object):
 				child = value.find()
 				if(child) : 
 					# находим объект в дереве и передаем его в рексию
+					group = None
+					nogroup = None
+					if(value.attrs.get('group')): # если указан атрибут для группировки
+						group = value.attrs.get('group')
+						del value.attrs['group']
+
+					if(value.attrs.get('nogroup')==''): # посик флага "не группировать"
+						nogroup = True
+
 					attrTemplate = self.AttrVarToTrue(value.attrs) # заменяем в значении $var на True
 					tag = dom.find_all(value.name, attrTemplate)
 					if tag :
 						if(len(tag) > 1) : # если несколько объектов, то нужно их разместить в массив
-							arr = []
+							arr = []	
+							if not group: # если атрибут для группировки не указан, то берем тег группы
+								group = value.name					
 							for elemTag in tag:
 								res = self.parsing(str(value), r''.join(map(str,elemTag.contents))) # рекурсия
-								_result = {**result, **res} # объединяем два списка
-								arr.append(_result)
-							result = arr
+								#_result = {**result, **res} # объединяем два списка
+								arr.append(res)
+							if(len(arr) > 1): # если найдено несколько блоков
+								if nogroup : # если установлен флаг "не группировать", то записываем только первый результат
+									result = {**result, **arr[0]}
+								else:
+									result[group] = arr # сохраняем первый найденый блок 
+							else:  
+								result = {**result, **arr}
 						else : # иначе просто записываем в переменную
 							res = self.parsing(str(value), r''.join(map(str,tag[0].contents))) # рекурсия
-							result = {**result, **res} # объединяем два списка
+							result = {**result, **res} if len(result) else res # объединяем два списка
 				else :
 					regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>$', str(value)) # ищим переменную
 					if regxRes :
@@ -62,9 +79,7 @@ class ParserHTML(object):
 								result[regxRes[0][1]] = arr
 							else : # иначе просто записываем в переменную
 								result[regxRes[0][1]] = re.sub(r'^\s+|\n|\r|\s+$', '', r''.join(map(str,tag[0].contents)))
-						# else :
-						# 	result[regxRes[0][1]] = None # если значение или тэг не найдены, то выводим None
-
+						
 				# Парсим шаблон <tag attr="$var">text</tag>
 				clearValue = re.sub(r'>.*<.*>', r'/>', str(value)) # убераем внутннее содержимое
 				regxRes = re.findall(r'<.*(\$([\w\d]+)).*/>', clearValue) # ищим переменную
@@ -85,8 +100,8 @@ class ParserHTML(object):
 									result[regxRes[0][1]] = arr									
 								else : # иначе просто записываем в переменную
 									result[regxRes[0][1]] = tag[0].attrs.get(attr)
-							# else :
-							# 	result[regxRes[0][1]] = None # если значение или тэг не найдены, то выводим None
+							else :
+								result[regxRes[0][1]] = None # если значение или тэг не найдены, то выводим None
 				
 
 		return result

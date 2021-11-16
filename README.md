@@ -49,3 +49,7 @@ print(result.get())
 ```json
 {'Head1': ['Header H1'], 'Head2': [['Header H2.1'], ['Header H2.2']], 'Price': ['$99'], 'Сurrency': 'USD', 'Description': ['Product description text'], 'Type': 'type1', 'product_gallery': '1', 'Img': ['img1.jpg', 'img2.jpg', 'img3.jpg']}
 ```
+
+### Обновление 2021-11-16
+Группировка, если задать атрибут group="имя группы". Если не заданно, тое именем будет тег узла
+Если установить атрибут nogroup, то из группы будет взята только первая группа значений
