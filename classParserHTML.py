@@ -113,13 +113,12 @@ class ParserHTML(object):
 
 if __name__ == '__main__':
 	# шаблон для парсинга
-	template = '<template>\
-		<h1>$head</h1>\
-		<p><a href="$link"></a></p>\
-		</template>\
-' 
-	# 
-	# <p>$text</p>\
+	template = '\
+		<template>\
+			<h1>$head</h1>\
+			<p>$text</p>\
+			<p><a href="$link"></a></p>\
+		</template>'
 
 	url = 'https://example.com/'
 	HTML = requests.get(url).text
