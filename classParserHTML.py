@@ -6,7 +6,10 @@ class ParserHTML(object):
 	def __init__(self, template, html):
 		self.template = template
 		self.html = html
-		self.result = self.parsing(self.template, self.html)
+
+		dom = BeautifulSoup(html,'html.parser') # то, что нужно спарсить
+		template =  BeautifulSoup(self.template, 'html.parser')
+		self.result = self.parsing(template.template, dom)
 
 	### Получить массив с результатом
 	def get(self):
@@ -21,11 +24,11 @@ class ParserHTML(object):
 		return listCopy
 
 	### Функция парсит html по шаблону template
-	def parsing(self, template, html) :
-		dom = BeautifulSoup(html,'html.parser') # то, что нужно спарсить
-		template =  BeautifulSoup(template, 'html.parser')
+	def parsing(self, template, dom) :
 		result = dict()
-		for value in template.find(): 
+
+		for value in template.children: # !!!! тут нужен перебор на одном уровнне
+
 			if(value.name != None) :
 				# print(value)
 				# Парсим шаблон <tag>$var</tag>
@@ -51,7 +54,7 @@ class ParserHTML(object):
 							if not group: # если атрибут для группировки не указан, то берем тег группы
 								group = value.name					
 							for elemTag in tag:
-								res = self.parsing(str(value), r''.join(map(str,elemTag.contents))) # рекурсия
+								res = self.parsing(value, elemTag) # рекурсия
 								#_result = {**result, **res} # объединяем два списка
 								arr.append(res)
 							if(len(arr) > 1): # если найдено несколько блоков
@@ -62,7 +65,7 @@ class ParserHTML(object):
 							else:  
 								result = {**result, **arr}
 						else : # иначе просто записываем в переменную
-							res = self.parsing(str(value), r''.join(map(str,tag[0].contents))) # рекурсия
+							res = self.parsing(value, tag[0]) # рекурсия
 							result = {**result, **res} if len(result) else res # объединяем два списка
 				else :
 					regxRes = re.findall(r'<(.*)>\$([\w\d]+)<\/.*>$', str(value)) # ищим переменную
@@ -102,8 +105,7 @@ class ParserHTML(object):
 									result[regxRes[0][1]] = tag[0].attrs.get(attr)
 							else :
 								result[regxRes[0][1]] = None # если значение или тэг не найдены, то выводим None
-				
-
+			
 		return result
 
 ### Example
@@ -111,13 +113,13 @@ class ParserHTML(object):
 
 if __name__ == '__main__':
 	# шаблон для парсинга
-	template = '\
-	<template>\
+	template = '<template>\
 		<h1>$head</h1>\
-		<p>$text</p>\
 		<p><a href="$link"></a></p>\
-	</template>' 
-	
+		</template>\
+' 
+	# 
+	# <p>$text</p>\
 
 	url = 'https://example.com/'
 	HTML = requests.get(url).text
